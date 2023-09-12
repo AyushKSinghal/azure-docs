@@ -17,8 +17,8 @@ API Management emits the following event types:
 
 | Event type | Description |
 | ---------- | ----------- |
-| Microsoft.ApiManagement.UserCreated | Raised when a user is created. |
-| Microsoft.ApiManagement.UserUpdated | Raised when a user is updated. |
+| Microsoft.Maintenance.PreMaintenanceEvent | Raised before maintenance start and give user opportunity to perform pre maintenance operations. |
+| Microsoft.Maintenance.PostMaintenanceEvent | Raised after maintenance completes and give opportunity to perform post maintenance operations. |
 
 
 ## Example event
