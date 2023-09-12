@@ -1746,6 +1746,9 @@
       - name: Portal
         displayName: Maintenance configurations
         href: maintenance-configurations-portal.md
+      - name: Send events to Event Grid
+        displayName: Maintenance configurations
+        href: maintenance-configurations-how-to-event-grid.md        
     - name: Scheduled events
       items:
       - name: Linux
