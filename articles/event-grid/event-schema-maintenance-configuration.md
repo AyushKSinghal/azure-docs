@@ -9,7 +9,7 @@ ms.date: 10/01/2023
 
 # Azure Maintenance Configurations as an Event Grid source
 
-This article provides the properties and schema for [Azure Maintenance Configurations](../virtual-machines/maintenance-configurations) events. For an introduction to event schemas, see [Azure Event Grid event schema](./event-schema.md). It also gives you links to articles to use API Management as an event source.
+This article provides the properties and schema for [Azure Maintenance Configurations](../virtual-machines/maintenance-configurations.md) events. For an introduction to event schemas, see [Azure Event Grid event schema](./event-schema.md). It also gives you links to articles to use API Management as an event source.
 
 ## Available event types
 
