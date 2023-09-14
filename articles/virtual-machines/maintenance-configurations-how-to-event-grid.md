@@ -15,68 +15,40 @@ Maintenance Configuration integrates with [Azure Event Grid](../event-grid/overv
 
 For example, using integration with Event Grid, you can build an application that start or shutdown VM, and sends an email notification each time maintenance schedule start or completes.
 
-In this article, you subscribe to Event Grid events for a Maintenance Configuration, trigger events, and send the events to an endpoint that processes the data. To keep it simple, you send events to a sample storage queue that show message:
+In this article, you subscribe to Event Grid events for a Maintenance Configuration, trigger events, and send the events to an endpoint that processes the data. To keep it simple, you send events to a sample storage queue that show message.
 
-:::image type="content" source="media/how-to-event-grid/event-grid-viewer-intro.png" alt-text="API Management events in Event Grid viewer":::
-
-[!INCLUDE [azure-cli-prepare-your-environment.md](../../includes/azure-cli-prepare-your-environment.md)]
-- If you don't already have an API Management service, complete the following quickstart: [Create an Azure API Management instance](get-started-create-service-instance.md)
-- Enable a [system-assigned managed identity](api-management-howto-use-managed-service-identity.md#create-a-system-assigned-managed-identity) in your API Management instance.
-- Create a [resource group](../azure-resource-manager/management/manage-resource-groups-portal.md#create-resource-groups) if you don't have one in which to deploy the sample endpoint.
-
-## Create an event endpoint
-
-In this section, you use a Resource Manager template to deploy a pre-built sample web application to Azure App Service. Later, you subscribe to your API Management instance's Event Grid events and specify this app as the endpoint to which the events are sent.
-
-To deploy the sample app, you can use the Azure CLI, Azure PowerShell, or the Azure portal. The following example uses the [az deployment group create](/cli/azure/deployment/group#az-deployment-group-create) command in the Azure CLI.
-
-* Set `RESOURCE_GROUP_NAME` to the name of an existing resource group
-* Set `SITE_NAME` to a unique name for your web app
-
-  The site name must be unique within Azure because it forms part of the fully qualified domain name (FQDN) of the web app. In a later section, you navigate to the app's FQDN in a web browser to view the events.
-
-```azurecli-interactive
-RESOURCE_GROUP_NAME=<your-resource-group-name>
-SITE_NAME=<your-site-name>
-
-az deployment group create \
-    --resource-group $RESOURCE_GROUP_NAME \
-    --template-uri "https://raw.githubusercontent.com/Azure-Samples/azure-event-grid-viewer/master/azuredeploy.json" \
-    --parameters siteName=$SITE_NAME hostingPlanName=$SITE_NAME-plan
-```
-
-Once the deployment has succeeded (it might take a few minutes), open a browser and navigate to your web app to make sure it's running:
-
-`https://<your-site-name>.azurewebsites.net`
-
-You should see the sample app rendered with no event messages displayed.
+## Prerequisites
+- Create a Storage Account
+- Create a  InGuest Scoped Maintenance Configuration. Create it using [Portal](maintenance-configurations-portal.md), [CLI](maintenance-configurations-portal.md), or [PowerShell](maintenance-configurations-portal.md)
+- Register the Event Grid resource provider
 
 [!INCLUDE [event-grid-register-provider-portal.md](../../includes/event-grid-register-provider-portal.md)]
 
-## Subscribe to API Management events
+## Subscribe to Maintenance Configuration events
 
-In Event Grid, you subscribe to a *topic* to tell it which events you want to track, and where to send them. Here, you create a subscription to events in your API Management instance.
+In Event Grid, you subscribe to a *topic* to tell it which events you want to track, and where to send them. Here, you create a subscription to events in your Maintenance Configuration instance.
 
-1. In the [Azure portal](https://portal.azure.com), navigate to your API Management instance.
-1. Select **Events > + Event Subscription**. 
+1. In the [Azure portal](https://portal.azure.com), navigate to your Maintenance Configuration instance.
+1. Select **Maintenance Events > + Event Subscription**.
+    :::image type="content" source="media/maintenance-configurations-how-to-event-grid/eventsblade.jpg" alt-text="Maintenance Configuration Events blade in Azure portal":::
 1. On the **Basic** tab:
     * Enter a descriptive **Name** for the event subscription.
-    * In **Event Types**, select one or more API Management event types to send to Event Grid. For the example in this article, select at least **Microsoft.APIManagement.ProductCreated** 
-    * In **Endpoint Details**, select the **Web Hook** event type, click **Select an endpoint**, and enter your web app URL followed by `api/updates`. Example: `https://myapp.azurewebsites.net/api/updates`.
+    * In **Event Types**, select one or more event types to send to Event Grid. For example, select both **Maintenance Pre Event and Maintenance Post Event** 
+    * In **Endpoint Details**, select the **Storage Queue** event type, click **Select an endpoint**, enter your **Storage Account** and create new queue **samplequeue**. Example: `https://myapp.azurewebsites.net/api/updates`.
     * Select **Confirm selection**.
 1. Leave the settings on the remaining tabs at their default values, and then select **Create**.
 
-    :::image type="content" source="media/how-to-event-grid/create-event-subscription.png" alt-text="Create an event subscription in Azure portal":::
+    :::image type="content" source="media/maintenance-configurations-how-to-event-grid/eventsubscription.jpg" alt-text="Create an event subscription in Azure portal":::
 
 ## Trigger and view events
 
-Now that the sample app is up and running and you've subscribed to your API Management instance with Event Grid, you're ready to generate events.
+You've subscribed to your Maintenance Configuration instance with Event Grid, now change Maintenance Configuration schedule time to current time + 40 mins.
 
-As an example, [create a product](./api-management-howto-add-products.md) in your API Management instance. If your event subscription includes the **Microsoft.APIManagement.ProductCreated** event, creating the product triggers an event that is pushed to your web app endpoint. 
+If your event subscription includes the **Maintenance Pre Event** event, upcoming Maintenance Configuration schedule triggers an event that is pushed to your storage queue. 
 
-Navigate to your Event Grid Viewer web app, and you should see the `ProductCreated` event. Select the button next to the event to show the details. 
+Navigate to your storage browser and check **samplequeue** storage queue, and you should see the `MaintenancePreEvent` event.  
 
-:::image type="content" source="media/how-to-event-grid/event-grid-viewer-product-created.png" alt-text="Product created event in Event Grid viewer":::
+:::image type="content" source="media/maintenance-configurations-how-to-event-grid/samplepreevent.jpg" alt-text="Maintenance Pre Event in Storage Queue":::
 
 ## Event Grid event schema
 
