@@ -1,5 +1,5 @@
 ---
-title: Send events from Azure API Management to Event Grid
+title: Send events from Maintenance Configuration to Event Grid
 description: In this quickstart, you enable Event Grid events for your Azure Maintenance Configuration instance, then send  events to a sample application.
 author: aysingha
 ms.topic: how-to
